@@ -12,128 +12,220 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Custom CSS for modern UI
+# Enhanced Custom CSS for modern UI
 st.markdown("""
 <style>
-    /* General Styling */
-    .main {
-        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-        padding: 20px;
+    /* Modern Color Palette */
+    :root {
+        --primary: #2563eb;
+        --primary-light: #3b82f6;
+        --secondary: #64748b;
+        --accent: #0ea5e9;
+        --background: #f8fafc;
+        --card: #ffffff;
+        --text: #1e293b;
+        --text-light: #64748b;
+        --success: #22c55e;
+        --danger: #ef4444;
+        --warning: #f59e0b;
+        --border: #e2e8f0;
     }
-    
+
+    /* Dark Mode Colors */
+    [data-theme="dark"] {
+        --primary: #3b82f6;
+        --primary-light: #60a5fa;
+        --secondary: #94a3b8;
+        --accent: #0ea5e9;
+        --background: #0f172a;
+        --card: #1e293b;
+        --text: #f8fafc;
+        --text-light: #cbd5e1;
+        --border: #334155;
+    }
+
+    /* General Layout */
+    .main {
+        background: var(--background);
+        color: var(--text);
+        font-family: 'Inter', sans-serif;
+        padding: 2rem;
+    }
+
+    /* Dashboard Header */
+    .dashboard-header {
+        text-align: center;
+        padding: 2rem 0;
+        margin-bottom: 2rem;
+        background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+        border-radius: 1rem;
+        color: white;
+    }
+
+    .dashboard-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+
+    .dashboard-subtitle {
+        font-size: 1.1rem;
+        opacity: 0.9;
+    }
+
+    /* Modern Stock Card */
+    .stock-card {
+        background: var(--card);
+        border-radius: 1rem;
+        padding: 1.5rem;
+        margin: 1rem 0;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        border: 1px solid var(--border);
+        transition: all 0.3s ease;
+    }
+
+    .stock-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    }
+
+    /* Stock Card Content */
+    .stock-symbol {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--text);
+        margin-bottom: 0.25rem;
+    }
+
+    .stock-company {
+        font-size: 0.875rem;
+        color: var(--text-light);
+        margin-bottom: 1rem;
+    }
+
+    .stock-price {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--text);
+        margin-bottom: 0.5rem;
+    }
+
+    .price-change {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.375rem 0.75rem;
+        border-radius: 0.5rem;
+        font-weight: 600;
+        font-size: 0.875rem;
+        margin-bottom: 1rem;
+    }
+
+    .price-change.positive {
+        background: rgba(34, 197, 94, 0.1);
+        color: var(--success);
+    }
+
+    .price-change.negative {
+        background: rgba(239, 68, 68, 0.1);
+        color: var(--danger);
+    }
+
+    /* Metrics Display */
+    .metrics-container {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.75rem;
+        margin-top: 1rem;
+    }
+
+    .metric {
+        background: var(--background);
+        padding: 0.75rem;
+        border-radius: 0.5rem;
+        text-align: center;
+    }
+
+    .metric-label {
+        font-size: 0.75rem;
+        color: var(--text-light);
+        margin-bottom: 0.25rem;
+    }
+
+    .metric-value {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: var(--text);
+    }
+
+    /* Section Headers */
+    .section-header {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--text);
+        margin: 2rem 0 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid var(--border);
+    }
+
+    /* Tabs Styling */
+    .stTabs [data-baseweb="tab-list"] {
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .stTabs [data-baseweb="tab"] {
+        background: var(--card);
+        border-radius: 0.5rem;
+        padding: 0.75rem 1.5rem;
+        color: var(--text);
+        border: 1px solid var(--border);
+    }
+
+    .stTabs [data-baseweb="tab"]:hover {
+        background: var(--primary-light);
+        color: white;
+    }
+
+    .stTabs [data-baseweb="tab"][aria-selected="true"] {
+        background: var(--primary);
+        color: white;
+        border-color: var(--primary);
+    }
+
     /* Sidebar Styling */
     .sidebar .sidebar-content {
-        background: #2c3e50;
-        color: white;
+        background: var(--card);
+        padding: 1.5rem;
+        border-radius: 1rem;
     }
-    
-    /* Stock Card Styling */
-    .stock-card {
-        background: white;
-        border-radius: 15px;
-        padding: 20px;
-        margin: 10px 0;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        transition: all 0.3s ease;
-        border-left: 5px solid #3498db;
+
+    /* Filter Controls */
+    .filter-section {
+        margin-bottom: 1.5rem;
     }
-    .stock-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 6px 20px rgba(0,0,0,0.15);
-    }
-    
-    /* Typography */
-    .title {
-        font-size: 20px;
+
+    .filter-title {
+        font-size: 1rem;
         font-weight: 600;
-        color: #2c3e50;
-        margin-bottom: 2px;
+        color: var(--text);
+        margin-bottom: 0.75rem;
     }
-    .company {
-        color: #7f8c8d;
-        font-size: 14px;
-        margin-bottom: 10px;
-    }
-    .ltp {
-        font-size: 24px;
-        font-weight: 700;
-        color: #2c3e50;
-        margin: 5px 0;
-    }
-    .change-container {
-        display: flex;
-        align-items: center;
-        margin: 5px 0;
-    }
-    .change {
-        font-size: 16px;
-        font-weight: 600;
-        margin-right: 5px;
-    }
-    .change-positive {
-        color: #27ae60;
-    }
-    .change-negative {
-        color: #c0392b;
-    }
-    .metric {
-        font-size: 14px;
-        color: #34495e;
-        margin: 5px 0;
-    }
-    .metric-value {
-        font-weight: 600;
-        color: #2980b9;
-    }
-    
-    /* Header */
-    .header {
-        text-align: center;
-        color: #2c3e50;
-        font-size: 36px;
-        font-weight: 700;
-        margin-bottom: 30px;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-    }
-    
-    /* Tabs */
-    .stTabs [data-baseweb="tab"] {
-        background-color: #ecf0f1;
-        border-radius: 10px 10px 0 0;
-        padding: 10px 20px;
-        margin-right: 5px;
-    }
-    .stTabs [data-baseweb="tab"]:hover {
-        background-color: #3498db;
+
+    /* Button Styling */
+    .stButton>button {
+        width: 100%;
+        padding: 0.75rem;
+        border-radius: 0.5rem;
+        background: var(--primary);
         color: white;
+        border: none;
+        font-weight: 600;
+        transition: all 0.2s ease;
     }
-    
-    /* Dark Mode */
-    [data-theme="dark"] .main {
-        background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
-    }
-    [data-theme="dark"] .stock-card {
-        background: #34495e;
-        color: white;
-    }
-    [data-theme="dark"] .title {
-        color: #ecf0f1;
-    }
-    [data-theme="dark"] .company {
-        color: #bdc3c7;
-    }
-    [data-theme="dark"] .ltp {
-        color: #ecf0f1;
-    }
-    [data-theme="dark"] .metric {
-        color: #ecf0f1;
-    }
-    [data-theme="dark"] .metric-value {
-        color: #3498db;
-    }
-    [data-theme="dark"] .header {
-        color: #ecf0f1;
+
+    .stButton>button:hover {
+        background: var(--primary-light);
+        transform: translateY(-1px);
     }
 </style>
 """, unsafe_allow_html=True)
@@ -285,33 +377,49 @@ def populate_market_cap_stocks():
         elif market_cap_class == "Small-cap":
             stocks["Market-cap"]["Small-cap"].append(stock_info)
 
-# Sidebar
-with st.sidebar:
-    st.title("Dashboard Controls")
-    dark_mode = st.toggle("Dark Mode")
-    if dark_mode:
-        st.markdown('<style>body {background-color: #2c3e50; color: white;}</style>', unsafe_allow_html=True)
-        st.markdown('<script>document.documentElement.setAttribute("data-theme", "dark")</script>', unsafe_allow_html=True)
-        st.session_state['dark_mode'] = True
-    else:
-        st.markdown('<script>document.documentElement.setAttribute("data-theme", "light")</script>', unsafe_allow_html=True)
-        st.session_state['dark_mode'] = False
-    
-    st.subheader("Filters")
-    sector_filter = st.multiselect("Select Sectors", options=stocks["Sector"].keys(), default=list(stocks["Sector"].keys()))
-    market_cap_filter = st.multiselect("Select Market Cap", options=stocks["Market-cap"].keys(), default=list(stocks["Market-cap"].keys()))
-
-# Main app
 def main():
-    # Populate market-cap stocks dynamically
-    populate_market_cap_stocks()
-    
-    st.markdown("<h1 class='header'>Indian Stock Analysis Dashboard</h1>", unsafe_allow_html=True)
-    
+    # Dashboard Header
+    st.markdown("""
+    <div class="dashboard-header">
+        <div class="dashboard-title">Indian Stock Analysis Dashboard</div>
+        <div class="dashboard-subtitle">Real-time market insights and analysis</div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    # Sidebar Controls
+    with st.sidebar:
+        st.markdown('<div class="filter-section">', unsafe_allow_html=True)
+        st.title("Dashboard Controls")
+        
+        # Dark Mode Toggle
+        dark_mode = st.toggle("Dark Mode", help="Toggle dark mode theme")
+        if dark_mode:
+            st.markdown('<script>document.documentElement.setAttribute("data-theme", "dark")</script>', unsafe_allow_html=True)
+            st.session_state['dark_mode'] = True
+        else:
+            st.markdown('<script>document.documentElement.setAttribute("data-theme", "light")</script>', unsafe_allow_html=True)
+            st.session_state['dark_mode'] = False
+        
+        # Filters
+        st.markdown('<div class="filter-title">Filters</div>', unsafe_allow_html=True)
+        sector_filter = st.multiselect(
+            "Select Sectors",
+            options=stocks["Sector"].keys(),
+            default=list(stocks["Sector"].keys())
+        )
+        
+        market_cap_filter = st.multiselect(
+            "Select Market Cap",
+            options=stocks["Market-cap"].keys(),
+            default=list(stocks["Market-cap"].keys())
+        )
+        st.markdown('</div>', unsafe_allow_html=True)
+
+    # Main Content
     tab1, tab2 = st.tabs(["Sector-wise", "Market-cap wise"])
     
     with tab1:
-        st.header("Sector-wise Stocks")
+        st.markdown('<div class="section-header">Sector-wise Stocks</div>', unsafe_allow_html=True)
         for sector in sector_filter:
             st.subheader(sector)
             cols = st.columns(2)
@@ -321,55 +429,81 @@ def main():
                 stock_data = get_stock_data(symbol)
                 
                 with cols[i % 2]:
-                    change_class = "change-positive" if stock_data['percent_change'] != "N/A" and stock_data['percent_change'] > 0 else "change-negative"
-                    triangle = "▲" if stock_data['percent_change'] != "N/A" and stock_data['percent_change'] > 0 else "▼"
-                    card_html = f"""
+                    change_class = "positive" if stock_data['percent_change'] > 0 else "negative"
+                    triangle = "▲" if stock_data['percent_change'] > 0 else "▼"
+                    
+                    st.markdown(f"""
                     <div class="stock-card">
-                        <div class="title">{symbol}</div>
-                        <div class="company">{company}</div>
-                        <div class="ltp">₹{stock_data['ltp']}</div>
-                        <div class="change-container">
-                            <span class="change {change_class}">{triangle} {stock_data['percent_change']}%</span>
+                        <div class="stock-symbol">{symbol}</div>
+                        <div class="stock-company">{company}</div>
+                        <div class="stock-price">₹{stock_data['ltp']:,.2f}</div>
+                        <div class="price-change {change_class}">
+                            {triangle} {stock_data['percent_change']:+.2f}%
                         </div>
-                        <div class="metric">P/E: <span class="metric-value">{stock_data['pe_ratio']}</span></div>
-                        <div class="metric">Yield: <span class="metric-value">{stock_data['yield']}%</span></div>
-                        <div class="metric">Market Cap: <span class="metric-value">{stock_data['market_cap_class']}</span></div>
+                        <div class="metrics-container">
+                            <div class="metric">
+                                <div class="metric-label">P/E</div>
+                                <div class="metric-value">{stock_data['pe_ratio']}</div>
+                            </div>
+                            <div class="metric">
+                                <div class="metric-label">Yield</div>
+                                <div class="metric-value">{stock_data['yield']}%</div>
+                            </div>
+                            <div class="metric">
+                                <div class="metric-label">Category</div>
+                                <div class="metric-value">{stock_data['market_cap_class']}</div>
+                            </div>
+                        </div>
                     </div>
-                    """
-                    st.markdown(card_html, unsafe_allow_html=True)
-                    if st.button(f"Details", key=f"btn_{symbol}_{sector}"):
+                    """, unsafe_allow_html=True)
+                    
+                    if st.button("View Details", key=f"btn_{symbol}_{sector}"):
                         st.session_state['selected_symbol'] = symbol
                         st.switch_page("pages/stock_details.py")
     
     with tab2:
-        st.header("Market-cap wise Stocks")
+        st.markdown('<div class="section-header">Market-cap wise Stocks</div>', unsafe_allow_html=True)
+        populate_market_cap_stocks()  # Update market cap classifications
+        
         for cap in market_cap_filter:
             st.subheader(cap)
-            if stocks["Market-cap"][cap]:  # Check if there are stocks in this category
-                cols = st.columns(min(2, len(stocks["Market-cap"][cap])))
+            if stocks["Market-cap"][cap]:
+                cols = st.columns(2)
                 for i, stock_info in enumerate(stocks["Market-cap"][cap]):
                     symbol = stock_info["symbol"]
                     company = stock_info["company"]
                     stock_data = get_stock_data(symbol)
                     
-                    with cols[i % len(cols)]:
-                        change_class = "change-positive" if stock_data['percent_change'] != "N/A" and stock_data['percent_change'] > 0 else "change-negative"
-                        triangle = "▲" if stock_data['percent_change'] != "N/A" and stock_data['percent_change'] > 0 else "▼"
-                        card_html = f"""
+                    with cols[i % 2]:
+                        change_class = "positive" if stock_data['percent_change'] > 0 else "negative"
+                        triangle = "▲" if stock_data['percent_change'] > 0 else "▼"
+                        
+                        st.markdown(f"""
                         <div class="stock-card">
-                            <div class="title">{symbol}</div>
-                            <div class="company">{company}</div>
-                            <div class="ltp">₹{stock_data['ltp']}</div>
-                            <div class="change-container">
-                                <span class="change {change_class}">{triangle} {stock_data['percent_change']}%</span>
+                            <div class="stock-symbol">{symbol}</div>
+                            <div class="stock-company">{company}</div>
+                            <div class="stock-price">₹{stock_data['ltp']:,.2f}</div>
+                            <div class="price-change {change_class}">
+                                {triangle} {stock_data['percent_change']:+.2f}%
                             </div>
-                            <div class="metric">P/E: <span class="metric-value">{stock_data['pe_ratio']}</span></div>
-                            <div class="metric">Yield: <span class="metric-value">{stock_data['yield']}%</span></div>
-                            <div class="metric">Market Cap: <span class="metric-value">{stock_data['market_cap_class']}</span></div>
+                            <div class="metrics-container">
+                                <div class="metric">
+                                    <div class="metric-label">P/E</div>
+                                    <div class="metric-value">{stock_data['pe_ratio']}</div>
+                                </div>
+                                <div class="metric">
+                                    <div class="metric-label">Yield</div>
+                                    <div class="metric-value">{stock_data['yield']}%</div>
+                                </div>
+                                <div class="metric">
+                                    <div class="metric-label">Market Cap</div>
+                                    <div class="metric-value">{stock_data['market_cap']}</div>
+                                </div>
+                            </div>
                         </div>
-                        """
-                        st.markdown(card_html, unsafe_allow_html=True)
-                        if st.button(f"Details", key=f"btn_cap_{symbol}_{cap}"):
+                        """, unsafe_allow_html=True)
+                        
+                        if st.button("View Details", key=f"btn_cap_{symbol}_{cap}"):
                             st.session_state['selected_symbol'] = symbol
                             st.switch_page("pages/stock_details.py")
             else:
