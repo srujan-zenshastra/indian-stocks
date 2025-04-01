@@ -4,100 +4,227 @@ import plotly.express as px
 import os
 import random
 
-# Set page configuration
+# Set page configuration with modern theme
 st.set_page_config(
     page_title="Stock Details",
     page_icon="📊",
-    layout="wide"
+    layout="wide",
+    initial_sidebar_state="expanded"
 )
 
-# Custom CSS for stock details page
+# Enhanced Custom CSS for modern UI
 st.markdown("""
 <style>
-    /* General Styling */
+    /* Modern Color Palette */
+    :root {
+        --primary: #2563eb;
+        --primary-light: #3b82f6;
+        --secondary: #64748b;
+        --accent: #0ea5e9;
+        --background: #f8fafc;
+        --card: #ffffff;
+        --text: #1e293b;
+        --text-light: #64748b;
+        --success: #22c55e;
+        --danger: #ef4444;
+        --warning: #f59e0b;
+        --border: #e2e8f0;
+    }
+
+    /* Dark Mode Colors */
+    [data-theme="dark"] {
+        --primary: #3b82f6;
+        --primary-light: #60a5fa;
+        --secondary: #94a3b8;
+        --accent: #0ea5e9;
+        --background: #0f172a;
+        --card: #1e293b;
+        --text: #f8fafc;
+        --text-light: #cbd5e1;
+        --border: #334155;
+    }
+
+    /* General Layout */
     .main {
-        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-        padding: 20px;
+        background: var(--background);
+        color: var(--text);
+        font-family: 'Inter', sans-serif;
     }
-    
-    /* Dark Mode */
-    [data-theme="dark"] .main {
-        background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+
+    /* Modern Card Design */
+    .stock-card {
+        background: var(--card);
+        border-radius: 1rem;
+        padding: 1.5rem;
+        margin: 1rem 0;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        border: 1px solid var(--border);
+        transition: all 0.3s ease;
     }
-    
+
+    .stock-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    }
+
     /* Typography */
-    .details-ltp {
-        font-size: 24px;
+    .stock-title {
+        font-size: 2rem;
         font-weight: 700;
-        color: #2c3e50;
-        display: inline-block;
-        margin-right: 20px;
+        color: var(--text);
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
     }
-    .details-change {
-        font-size: 16px;
+
+    .stock-subtitle {
+        font-size: 1.1rem;
+        color: var(--text-light);
+        margin-bottom: 1.5rem;
+    }
+
+    /* Price Display */
+    .price-container {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .current-price {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--text);
+    }
+
+    .price-change {
+        font-size: 1.2rem;
         font-weight: 600;
-        display: inline-block;
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
     }
-    .change-positive {
-        color: #27ae60;
+
+    .price-change.positive {
+        background: rgba(34, 197, 94, 0.1);
+        color: var(--success);
     }
-    .change-negative {
-        color: #c0392b;
+
+    .price-change.negative {
+        background: rgba(239, 68, 68, 0.1);
+        color: var(--danger);
     }
-    .metric {
-        font-size: 14px;
-        color: #34495e;
-        margin: 5px 0;
+
+    /* Metrics Grid */
+    .metrics-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin: 1.5rem 0;
     }
+
+    .metric-card {
+        background: var(--card);
+        padding: 1rem;
+        border-radius: 0.75rem;
+        border: 1px solid var(--border);
+    }
+
+    .metric-label {
+        font-size: 0.875rem;
+        color: var(--text-light);
+        margin-bottom: 0.25rem;
+    }
+
     .metric-value {
+        font-size: 1.25rem;
         font-weight: 600;
-        color: #2980b9;
+        color: var(--text);
     }
-    [data-theme="dark"] .details-ltp {
-        color: #ecf0f1;
+
+    /* Chart Container */
+    .chart-container {
+        background: var(--card);
+        border-radius: 1rem;
+        padding: 1.5rem;
+        margin: 1.5rem 0;
+        border: 1px solid var(--border);
     }
-    [data-theme="dark"] .metric {
-        color: #ecf0f1;
-    }
-    [data-theme="dark"] .metric-value {
-        color: #3498db;
-    }
-    
-    /* Toggle Button Styling */
+
+    /* Toggle Buttons */
     .toggle-container {
         display: flex;
-        justify-content: flex-end;
-        margin-bottom: 10px;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
     }
-    .toggle-container button {
-        margin-left: 8px !important;
-        border-radius: 5px !important;
-        padding: 5px 10px !important;
+
+    .toggle-button {
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
+        border: 1px solid var(--border);
+        background: var(--card);
+        color: var(--text);
+        cursor: pointer;
+        transition: all 0.2s ease;
     }
-    .stButton>button:hover {
-        background-color: #e0e0e0;
-    }
-    .stButton>button:focus {
-        background-color: #3498db;
+
+    .toggle-button:hover {
+        background: var(--primary-light);
         color: white;
     }
-    
-    /* Fix for horizontal button alignment */
-    .button-row {
-        display: flex;
-        justify-content: flex-end;
-        gap: 10px;
+
+    .toggle-button.active {
+        background: var(--primary);
+        color: white;
+        border-color: var(--primary);
     }
-    .button-row > div {
-        margin: 0 !important;
+
+    /* Back Button */
+    .back-button {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1.5rem;
+        border-radius: 0.5rem;
+        background: var(--primary);
+        color: white;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        margin-top: 1.5rem;
     }
-    .button-row button {
-        margin: 0 !important;
+
+    .back-button:hover {
+        background: var(--primary-light);
+        transform: translateY(-1px);
+    }
+
+    /* Description Card */
+    .description-card {
+        background: var(--card);
+        border-radius: 1rem;
+        padding: 1.5rem;
+        margin: 1.5rem 0;
+        border: 1px solid var(--border);
+    }
+
+    .description-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--text);
+        margin-bottom: 1rem;
+    }
+
+    .description-content {
+        color: var(--text-light);
+        line-height: 1.6;
     }
 </style>
 """, unsafe_allow_html=True)
 
-# Define stock data (same as in Home.py)
+# Define stock data (same as in original file)
 stocks = {
     "Sector": {
         "Tech": [
@@ -127,7 +254,7 @@ stocks = {
     }
 }
 
-# Load data function
+# Load data function (same as in original file)
 @st.cache_data
 def load_data():
     base_path = r"C:\Users\Srujan KV\Desktop\Srujan Zenshastra\WEEK 7\Indian stockk dashboard"
@@ -160,7 +287,7 @@ except FileNotFoundError as e:
     st.error(f"Error: {e}. Please ensure all CSV files are present in the specified directory.")
     st.stop()
 
-# Get stock data function
+# Get stock data function (same as in original file)
 def get_stock_data(symbol):
     symbol = symbol.strip().upper()
     weekly_perf = weekly_data[weekly_data['Symbol'].str.strip().str.upper() == symbol].sort_values('Date')
@@ -188,7 +315,6 @@ def get_stock_data(symbol):
         market_cap_value = float(traded['Mkt Cap (₹ Crores)'])
         market_cap = f"₹{market_cap_value:,.2f} Cr"
         
-        # Classify market cap with new thresholds
         if market_cap_value > 50000:
             market_cap_class = "Large-cap"
         elif 16000 <= market_cap_value <= 50000:
@@ -214,14 +340,13 @@ def get_stock_data(symbol):
         'percent_change': percent_change
     }
 
-# Main function for stock details page
 def main():
     # Get the symbol from session state
     symbol = st.session_state.get('selected_symbol', None)
     
     if not symbol:
         st.error("No stock symbol provided. Please return to the dashboard and select a stock.")
-        if st.button("Back to Dashboard"):
+        if st.button("Back to Dashboard", key="back_error"):
             st.switch_page("Home.py")
         return
     
@@ -237,123 +362,136 @@ def main():
     
     if not stock_info:
         st.error(f"Stock {symbol} not found in the database.")
-        if st.button("Back to Dashboard"):
+        if st.button("Back to Dashboard", key="back_not_found"):
             st.switch_page("Home.py")
         return
     
-    # Stock Details
-    st.subheader(f"{symbol} - {stock_info['company']}")
-    
+    # Stock Header
     stock_data = get_stock_data(symbol)
     
-    # LTP and Percent Change (simple layout)
-    change_class = "change-positive" if stock_data['percent_change'] != "N/A" and stock_data['percent_change'] > 0 else "change-negative"
-    triangle = "▲" if stock_data['percent_change'] != "N/A" and stock_data['percent_change'] > 0 else "▼"
-    details_header_html = f"""
-    <div>
-        <span class="details-ltp">₹{stock_data['ltp']}</span>
-        <span class="details-change {change_class}">{triangle} {stock_data['percent_change']}%</span>
+    # Modern Header Section
+    st.markdown(f"""
+    <div class="stock-card">
+        <div class="stock-title">
+            {symbol}
+            <span style="font-size: 1.2rem; color: var(--text-light);">•</span>
+            <span style="font-size: 1.2rem; color: var(--text-light);">{stock_info['company']}</span>
+        </div>
+        
+        <div class="price-container">
+            <span class="current-price">₹{stock_data['ltp']:,.2f}</span>
+            <span class="price-change {'positive' if stock_data['percent_change'] > 0 else 'negative'}">
+                {'+' if stock_data['percent_change'] > 0 else ''}{stock_data['percent_change']:.2f}%
+                {'▲' if stock_data['percent_change'] > 0 else '▼'}
+            </span>
+        </div>
     </div>
-    """
-    st.markdown(details_header_html, unsafe_allow_html=True)
+    """, unsafe_allow_html=True)
     
-    # Stock Description
-    st.markdown(f"**Description:** {stock_info['description']}")
+    # Description Card
+    st.markdown(f"""
+    <div class="description-card">
+        <div class="description-title">Company Overview</div>
+        <div class="description-content">{stock_info['description']}</div>
+    </div>
+    """, unsafe_allow_html=True)
     
-    # Price Chart Section
-    st.markdown("### Price Chart")
+    # Key Metrics Grid
+    st.markdown("""
+    <div class="metrics-grid">
+        <div class="metric-card">
+            <div class="metric-label">P/E Ratio</div>
+            <div class="metric-value">{}</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-label">52-Week High</div>
+            <div class="metric-value">₹{:,.2f}</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-label">52-Week Low</div>
+            <div class="metric-value">₹{:,.2f}</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-label">Yield</div>
+            <div class="metric-value">{:.2f}%</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-label">Market Cap</div>
+            <div class="metric-value">{}</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-label">Category</div>
+            <div class="metric-value">{}</div>
+        </div>
+    </div>
+    """.format(
+        stock_data['pe_ratio'],
+        stock_data['52_week_high'],
+        stock_data['52_week_low'],
+        stock_data['yield'],
+        stock_data['market_cap'],
+        stock_data['market_cap_class']
+    ), unsafe_allow_html=True)
     
-    # Toggle for Weekly/Monthly Data (positioned at top-right)
+    # Chart Section
+    st.markdown("""
+    <div class="chart-container">
+        <h2 style="margin-bottom: 1rem;">Price History</h2>
+    """, unsafe_allow_html=True)
+    
+    # Chart Toggle
+    col1, col2 = st.columns([5, 1])
+    with col2:
+        st.markdown('<div class="toggle-container">', unsafe_allow_html=True)
+        weekly = st.button("1W", key="weekly", help="Show weekly data")
+        monthly = st.button("1M", key="monthly", help="Show monthly data")
+        st.markdown('</div>', unsafe_allow_html=True)
+    
     if 'chart_view' not in st.session_state:
         st.session_state['chart_view'] = 'weekly'
     
-    # Use a container with columns to position the toggle buttons horizontally
-    col1, col2 = st.columns([5, 1])
+    if weekly:
+        st.session_state['chart_view'] = 'weekly'
+    if monthly:
+        st.session_state['chart_view'] = 'monthly'
     
-    with col2:
-        # Apply custom HTML/CSS for button alignment
-        st.markdown('<div class="button-row">', unsafe_allow_html=True)
-        left_col, right_col = st.columns(2)
-        with left_col:
-            weekly_button = st.button("1W")
-        with right_col:
-            monthly_button = st.button("1M")
-        st.markdown('</div>', unsafe_allow_html=True)
-        
-        if weekly_button:
-            st.session_state['chart_view'] = 'weekly'
-        if monthly_button:
-            st.session_state['chart_view'] = 'monthly'
-    
-    # Display the selected chart
+    # Display Chart
     if st.session_state['chart_view'] == 'weekly':
-        # Weekly Performance Graph
-        weekly_perf = stock_data['weekly_performance'].copy()
-        if not weekly_perf.empty and not weekly_perf['Close Price'].isna().all():
-            min_price = weekly_perf['Close Price'].min()
-            max_price = weekly_perf['Close Price'].max()
-            # Set Y-axis range to start below the minimum price
-            y_axis_range = [min_price * 0.95, max_price * 1.05]  # 5% buffer below min and above max
-            
-            fig_weekly = px.line(weekly_perf, x='Date', y='Close Price', title=f"{symbol} - Weekly Performance",
-                                 template="plotly_white" if not st.session_state.get('dark_mode', False) else "plotly_dark")
-            fig_weekly.update_layout(
-                xaxis_title="Date",
-                yaxis_title="Price (₹)",
-                yaxis=dict(range=y_axis_range, tickformat=".2f"),
-                xaxis=dict(tickmode='auto', nticks=5, tickformat="%d %b %Y"),
-                plot_bgcolor='rgba(0,0,0,0)',
-                paper_bgcolor='rgba(0,0,0,0)',
-                margin=dict(t=50)  # Adjust top margin to prevent overlap with toggle
-            )
-            st.plotly_chart(fig_weekly, use_container_width=True)
-        else:
-            st.info(f"No weekly performance data available for {symbol}")
-    
+        data = stock_data['weekly_performance']
+        title = "Weekly Performance"
     else:
-        # Monthly Performance Graph
-        monthly_perf = stock_data['monthly_performance'].copy()
-        if not monthly_perf.empty and not monthly_perf['Close Price'].isna().all():
-            min_price = monthly_perf['Close Price'].min()
-            max_price = monthly_perf['Close Price'].max()
-            # Set Y-axis range to start below the minimum price
-            y_axis_range = [min_price * 0.95, max_price * 1.05]  # 5% buffer below min and above max
-            
-            fig_monthly = px.line(monthly_perf, x='Date', y='Close Price', title=f"{symbol} - Monthly Performance",
-                                  template="plotly_white" if not st.session_state.get('dark_mode', False) else "plotly_dark")
-            fig_monthly.update_layout(
-                xaxis_title="Date",
-                yaxis_title="Price (₹)",
-                yaxis=dict(range=y_axis_range, tickformat=".2f"),
-                xaxis=dict(tickmode='auto', nticks=5, tickformat="%d %b %Y"),
-                plot_bgcolor='rgba(0,0,0,0)',
-                paper_bgcolor='rgba(0,0,0,0)',
-                margin=dict(t=50)  # Adjust top margin to prevent overlap with toggle
-            )
-            st.plotly_chart(fig_monthly, use_container_width=True)
-        else:
-            st.info(f"No monthly performance data available for {symbol}")
+        data = stock_data['monthly_performance']
+        title = "Monthly Performance"
     
-    # Company Overview Section
-    st.subheader("Company Overview")
-    cols = st.columns(3)
-    with cols[0]:
-        st.metric("P/E Ratio", stock_data['pe_ratio'])
-    with cols[1]:
-        st.metric("52-Week High", stock_data['52_week_high'])
-    with cols[2]:
-        st.metric("52-Week Low", stock_data['52_week_low'])
+    if not data.empty and not data['Close Price'].isna().all():
+        fig = px.line(data, x='Date', y='Close Price',
+                     title=f"{symbol} - {title}",
+                     template="plotly_white" if not st.session_state.get('dark_mode', False) else "plotly_dark")
+        
+        fig.update_layout(
+            plot_bgcolor='rgba(0,0,0,0)',
+            paper_bgcolor='rgba(0,0,0,0)',
+            xaxis_title="Date",
+            yaxis_title="Price (₹)",
+            hovermode='x unified',
+            showlegend=False,
+            margin=dict(t=30, r=10, b=30, l=60)
+        )
+        
+        fig.update_traces(
+            line_color='#2563eb',
+            line_width=2,
+            hovertemplate='₹%{y:,.2f}<extra></extra>'
+        )
+        
+        st.plotly_chart(fig, use_container_width=True)
+    else:
+        st.info(f"No {title.lower()} data available for {symbol}")
     
-    cols = st.columns(3)
-    with cols[0]:
-        st.metric("Yield", f"{stock_data['yield']}%")
-    with cols[1]:
-        st.metric("Market Cap", stock_data['market_cap'])
-    with cols[2]:
-        st.metric("Market Cap Class", stock_data['market_cap_class'])
+    st.markdown("</div>", unsafe_allow_html=True)
     
-    # Back to Dashboard Button
-    if st.button("Back to Dashboard"):
+    # Back Button
+    if st.button("← Back to Dashboard", key="back_main"):
         st.switch_page("Home.py")
 
 if __name__ == "__main__":
