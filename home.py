@@ -12,7 +12,11 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Enhanced Custom CSS for modern UI
+# Initialize session state for dark mode if not exists
+if 'dark_mode' not in st.session_state:
+    st.session_state['dark_mode'] = False
+
+# Enhanced Custom CSS for modern UI with dynamic theme switching
 st.markdown("""
 <style>
     /* Modern Color Palette */
@@ -42,6 +46,16 @@ st.markdown("""
         --text: #f8fafc;
         --text-light: #cbd5e1;
         --border: #334155;
+    }
+
+    /* Apply theme to Streamlit elements */
+    .stApp {
+        background-color: var(--background);
+        color: var(--text);
+    }
+
+    .stMarkdown, .stText {
+        color: var(--text);
     }
 
     /* General Layout */
@@ -228,6 +242,28 @@ st.markdown("""
         transform: translateY(-1px);
     }
 </style>
+
+<script>
+    // Function to set theme
+    function setTheme(isDark) {
+        document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+    }
+
+    // Initialize theme
+    setTheme(window.localStorage.getItem('dark_mode') === 'true');
+
+    // Watch for theme changes
+    const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+            if (mutation.type === 'attributes' && mutation.attributeName === 'data-theme') {
+                const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+                window.localStorage.setItem('dark_mode', isDark);
+            }
+        });
+    });
+
+    observer.observe(document.documentElement, { attributes: true });
+</script>
 """, unsafe_allow_html=True)
 
 # Define stock data with updated stocks
