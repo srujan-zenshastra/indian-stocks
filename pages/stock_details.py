@@ -4,7 +4,7 @@ import plotly.express as px
 import os
 import random
 
-# Set page configuration with modern theme
+# Set page configuration
 st.set_page_config(
     page_title="Stock Details",
     page_icon="📊",
@@ -42,6 +42,16 @@ st.markdown("""
         --text: #f8fafc;
         --text-light: #cbd5e1;
         --border: #334155;
+    }
+
+    /* Apply theme to Streamlit elements */
+    .stApp {
+        background-color: var(--background);
+        color: var(--text);
+    }
+
+    .stMarkdown, .stText {
+        color: var(--text);
     }
 
     /* General Layout */
@@ -224,7 +234,7 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# Define stock data (same as in original file)
+# Define stock data
 stocks = {
     "Sector": {
         "Tech": [
@@ -254,91 +264,138 @@ stocks = {
     }
 }
 
-# Load data function (same as in original file)
+# Load data function
 @st.cache_data
 def load_data():
-    base_path = r"C:\Users\Srujan KV\Desktop\Srujan Zenshastra\WEEK 7\Indian stockk dashboard"
-    weekly_data = pd.read_csv(os.path.join(base_path, 'etf_week.csv'))
-    weekly_data.columns = weekly_data.columns.str.strip()
-    weekly_data = weekly_data[['Date', 'Symbol', 'Close Price']]
-    weekly_data['Date'] = pd.to_datetime(weekly_data['Date'])
-    weekly_data['Close Price'] = weekly_data['Close Price'].astype(str).str.replace(',', '').astype(float)
+    try:
+        weekly_data = pd.read_csv('etf_week.csv')
+        weekly_data.columns = weekly_data.columns.str.strip()
+        weekly_data = weekly_data[['Date', 'Symbol', 'Close Price']]
+        weekly_data['Date'] = pd.to_datetime(weekly_data['Date'])
+        weekly_data['Close Price'] = weekly_data['Close Price'].astype(str).str.replace(',', '').astype(float)
 
-    monthly_data = pd.read_csv(os.path.join(base_path, 'etf_month.csv'))
-    monthly_data.columns = monthly_data.columns.str.strip()
-    monthly_data = monthly_data[['Date', 'Symbol', 'Close Price']]
-    monthly_data['Date'] = pd.to_datetime(monthly_data['Date'])
-    monthly_data['Close Price'] = monthly_data['Close Price'].astype(str).str.replace(',', '').astype(float)
+        monthly_data = pd.read_csv('etf_month.csv')
+        monthly_data.columns = monthly_data.columns.str.strip()
+        monthly_data = monthly_data[['Date', 'Symbol', 'Close Price']]
+        monthly_data['Date'] = pd.to_datetime(monthly_data['Date'])
+        monthly_data['Close Price'] = monthly_data['Close Price'].astype(str).str.replace(',', '').astype(float)
 
-    high_low_data = pd.read_csv(os.path.join(base_path, '52W-high-low.csv'))
-    high_low_data.columns = high_low_data.columns.str.strip()
+        high_low_data = pd.read_csv('52W-high-low.csv')
+        high_low_data.columns = high_low_data.columns.str.strip()
 
-    pe_data = pd.read_csv(os.path.join(base_path, 'PE.csv'))
-    pe_data.columns = pe_data.columns.str.strip()
+        pe_data = pd.read_csv('PE.csv')
+        pe_data.columns = pe_data.columns.str.strip()
 
-    traded_data = pd.read_csv(os.path.join(base_path, 'StocksTraded.csv'))
-    traded_data.columns = traded_data.columns.str.strip()
+        traded_data = pd.read_csv('StocksTraded.csv')
+        traded_data.columns = traded_data.columns.str.strip()
 
-    return weekly_data, monthly_data, high_low_data, pe_data, traded_data
+        return weekly_data, monthly_data, high_low_data, pe_data, traded_data
+    except Exception as e:
+        st.error(f"Error loading data: {str(e)}")
+        return None, None, None, None, None
 
-try:
-    weekly_data, monthly_data, high_low_data, pe_data, traded_data = load_data()
-except FileNotFoundError as e:
-    st.error(f"Error: {e}. Please ensure all CSV files are present in the specified directory.")
-    st.stop()
-
-# Get stock data function (same as in original file)
+# Get stock data function
 def get_stock_data(symbol):
-    symbol = symbol.strip().upper()
-    weekly_perf = weekly_data[weekly_data['Symbol'].str.strip().str.upper() == symbol].sort_values('Date')
-    monthly_perf = monthly_data[monthly_data['Symbol'].str.strip().str.upper() == symbol].sort_values('Date')
-    
     try:
-        high_low = high_low_data[high_low_data['SYMBOL'].str.strip().str.upper() == symbol].iloc[0]
-        week_52_high = float(high_low['Adjusted 52_Week_High'])
-        week_52_low = float(high_low['Adjusted 52_Week_Low'])
-    except IndexError:
-        week_52_high = "N/A"
-        week_52_low = "N/A"
-    
-    try:
-        pe = float(pe_data[pe_data['SYMBOL'].str.strip().str.upper() == symbol].iloc[0]['ADJUSTED P/E'])
-    except IndexError:
-        pe = "N/A"
-    
-    yield_value = round(random.uniform(1, 5), 2)
-    
-    try:
-        traded = traded_data[traded_data['Symbol'].str.strip().str.upper() == symbol].iloc[0]
-        ltp = float(traded['LTP'])
-        percent_change = float(traded['%chng'])
-        market_cap_value = float(traded['Mkt Cap (₹ Crores)'])
-        market_cap = f"₹{market_cap_value:,.2f} Cr"
+        weekly_data, monthly_data, high_low_data, pe_data, traded_data = load_data()
+        if any(data is None for data in [weekly_data, monthly_data, high_low_data, pe_data, traded_data]):
+            return None
+
+        symbol = symbol.strip().upper()
+        weekly_perf = weekly_data[weekly_data['Symbol'].str.strip().str.upper() == symbol].sort_values('Date')
+        monthly_perf = monthly_data[monthly_data['Symbol'].str.strip().str.upper() == symbol].sort_values('Date')
         
-        if market_cap_value > 50000:
-            market_cap_class = "Large-cap"
-        elif 16000 <= market_cap_value <= 50000:
-            market_cap_class = "Mid-cap"
+        try:
+            high_low = high_low_data[high_low_data['SYMBOL'].str.strip().str.upper() == symbol].iloc[0]
+            week_52_high = float(str(high_low['Adjusted 52_Week_High']).replace(',', ''))
+            week_52_low = float(str(high_low['Adjusted 52_Week_Low']).replace(',', ''))
+        except (IndexError, ValueError):
+            week_52_high = 0
+            week_52_low = 0
+        
+        try:
+            pe = float(pe_data[pe_data['SYMBOL'].str.strip().str.upper() == symbol].iloc[0]['ADJUSTED P/E'])
+        except (IndexError, ValueError):
+            pe = 0
+        
+        yield_value = round(random.uniform(1, 5), 2)
+        
+        try:
+            traded = traded_data[traded_data['Symbol'].str.strip().str.upper() == symbol].iloc[0]
+            ltp = float(str(traded['LTP']).replace(',', ''))
+            percent_change = float(str(traded['%chng']).replace(',', ''))
+            market_cap_value = float(str(traded['Mkt Cap (₹ Crores)']).replace(',', ''))
+            market_cap = f"₹{market_cap_value:,.2f} Cr"
+            
+            if market_cap_value > 50000:
+                market_cap_class = "Large-cap"
+            elif 16000 <= market_cap_value <= 50000:
+                market_cap_class = "Mid-cap"
+            else:
+                market_cap_class = "Small-cap"
+        except (IndexError, ValueError):
+            ltp = 0
+            percent_change = 0
+            market_cap = "N/A"
+            market_cap_class = "N/A"
+        
+        return {
+            'weekly_performance': weekly_perf,
+            'monthly_performance': monthly_perf,
+            '52_week_high': week_52_high,
+            '52_week_low': week_52_low,
+            'pe_ratio': pe,
+            'yield': yield_value,
+            'market_cap': market_cap,
+            'market_cap_class': market_cap_class,
+            'ltp': ltp,
+            'percent_change': percent_change
+        }
+    except Exception as e:
+        st.error(f"Error processing stock data: {str(e)}")
+        return None
+
+# Function to display stock card with divs instead of spans
+def display_stock_card(symbol, stock_info, stock_data):
+    try:
+        ltp = stock_data.get('ltp', 'N/A')
+        ltp_display = f"₹{ltp:,.2f}" if isinstance(ltp, (int, float)) else str(ltp)
+        
+        percent_change = stock_data.get('percent_change', 'N/A')
+        if isinstance(percent_change, (int, float)):
+            percent_display = f"{'+' if percent_change >= 0 else ''}{percent_change:.2f}%"
+            change_class = 'positive' if percent_change >= 0 else 'negative'
+            change_icon = '▲' if percent_change >= 0 else '▼'
         else:
-            market_cap_class = "Small-cap"
-    except IndexError:
-        ltp = "N/A"
-        percent_change = "N/A"
-        market_cap = "N/A"
-        market_cap_class = "N/A"
-    
-    return {
-        'weekly_performance': weekly_perf,
-        'monthly_performance': monthly_perf,
-        '52_week_high': week_52_high,
-        '52_week_low': week_52_low,
-        'pe_ratio': pe,
-        'yield': yield_value,
-        'market_cap': market_cap,
-        'market_cap_class': market_cap_class,
-        'ltp': ltp,
-        'percent_change': percent_change
-    }
+            percent_display = str(percent_change)
+            change_class = 'negative'  # Default for non-numeric
+            change_icon = '—'
+        
+        company_name = stock_info.get('company', 'Unknown Company')
+    except Exception as e:
+        st.error(f"Error preparing stock data: {e}")
+        return
+
+    html_content = f"""
+    <div class="stock-card">
+        <div class="stock-title">
+            {symbol}
+            <div style="font-size: 1.2rem; color: var(--text-light); display: inline;"> • </div>
+            <div style="font-size: 1.2rem; color: var(--text-light); display: inline;">{company_name}</div>
+        </div>
+        <div class="price-container">
+            <div class="current-price">{ltp_display}</div>
+            <div class="price-change {change_class}">
+                {percent_display} {change_icon}
+            </div>
+        </div>
+    </div>
+    """
+
+    try:
+        st.markdown(html_content, unsafe_allow_html=True)
+    except Exception as e:
+        st.error(f"Error rendering stock card: {e}")
 
 def main():
     # Get the symbol from session state
@@ -366,27 +423,16 @@ def main():
             st.switch_page("Home.py")
         return
     
-    # Stock Header
+    # Get stock data
     stock_data = get_stock_data(symbol)
-    
-    # Modern Header Section
-    st.markdown(f"""
-    <div class="stock-card">
-        <div class="stock-title">
-            {symbol}
-            <span style="font-size: 1.2rem; color: var(--text-light);">•</span>
-            <span style="font-size: 1.2rem; color: var(--text-light);">{stock_info['company']}</span>
-        </div>
-        
-        <div class="price-container">
-            <span class="current-price">₹{stock_data['ltp']:,.2f}</span>
-            <span class="price-change {'positive' if stock_data['percent_change'] > 0 else 'negative'}">
-                {'+' if stock_data['percent_change'] > 0 else ''}{stock_data['percent_change']:.2f}%
-                {'▲' if stock_data['percent_change'] > 0 else '▼'}
-            </span>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
+    if stock_data is None:
+        st.error("Error loading stock data. Please try again.")
+        if st.button("Back to Dashboard", key="back_error_data"):
+            st.switch_page("Home.py")
+        return
+
+    # Stock Header using the new function
+    display_stock_card(symbol, stock_info, stock_data)
     
     # Description Card
     st.markdown(f"""
@@ -397,41 +443,34 @@ def main():
     """, unsafe_allow_html=True)
     
     # Key Metrics Grid
-    st.markdown("""
+    st.markdown(f"""
     <div class="metrics-grid">
         <div class="metric-card">
             <div class="metric-label">P/E Ratio</div>
-            <div class="metric-value">{}</div>
+            <div class="metric-value">{stock_data['pe_ratio']:.2f}</div>
         </div>
         <div class="metric-card">
             <div class="metric-label">52-Week High</div>
-            <div class="metric-value">₹{:,.2f}</div>
+            <div class="metric-value">₹{stock_data['52_week_high']:,.2f}</div>
         </div>
         <div class="metric-card">
             <div class="metric-label">52-Week Low</div>
-            <div class="metric-value">₹{:,.2f}</div>
+            <div class="metric-value">₹{stock_data['52_week_low']:,.2f}</div>
         </div>
         <div class="metric-card">
             <div class="metric-label">Yield</div>
-            <div class="metric-value">{:.2f}%</div>
+            <div class="metric-value">{stock_data['yield']:.2f}%</div>
         </div>
         <div class="metric-card">
             <div class="metric-label">Market Cap</div>
-            <div class="metric-value">{}</div>
+            <div class="metric-value">{stock_data['market_cap']}</div>
         </div>
         <div class="metric-card">
             <div class="metric-label">Category</div>
-            <div class="metric-value">{}</div>
+            <div class="metric-value">{stock_data['market_cap_class']}</div>
         </div>
     </div>
-    """.format(
-        stock_data['pe_ratio'],
-        stock_data['52_week_high'],
-        stock_data['52_week_low'],
-        stock_data['yield'],
-        stock_data['market_cap'],
-        stock_data['market_cap_class']
-    ), unsafe_allow_html=True)
+    """, unsafe_allow_html=True)
     
     # Chart Section
     st.markdown("""
