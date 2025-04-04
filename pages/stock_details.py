@@ -238,28 +238,28 @@ st.markdown("""
 stocks = {
     "Sector": {
         "Tech": [
-            {"symbol": "INFY", "company": "Infosys Ltd.", "description": "Infosys is a global leader in next-generation digital services and consulting. It empowers businesses with agile digital solutions. The company operates across multiple industries worldwide."},
-            {"symbol": "TCS", "company": "Tata Consultancy Services Ltd.", "description": "TCS is a leading global IT services, consulting, and business solutions organization. Part of the Tata Group, it serves clients worldwide. It specializes in digital transformation and IT services."},
-            {"symbol": "COFORGE", "company": "Coforge Ltd.", "description": "Coforge is a global IT solutions organization providing digital services. It focuses on innovative technology transformations. The company caters to various sectors including finance and travel."},
-            {"symbol": "MASTEK", "company": "Mastek Ltd.", "description": "Mastek provides enterprise technology solutions and digital transformation services. It caters to various industries globally. The company is known for its agile and innovative approach."}
+            {"symbol": "INFY", "company": "Infosys Ltd.", "description": "Infosys is a global leader in next-generation digital services and consulting."},
+            {"symbol": "TCS", "company": "Tata Consultancy Services Ltd.", "description": "TCS is a leading global IT services, consulting, and business solutions organization."},
+            {"symbol": "COFORGE", "company": "Coforge Ltd.", "description": "Coforge is a global IT solutions organization providing digital services."},
+            {"symbol": "MASTEK", "company": "Mastek Ltd.", "description": "Mastek provides enterprise technology solutions and digital transformation services."}
         ],
         "Finance": [
-            {"symbol": "HDFCBANK", "company": "HDFC Bank Ltd.", "description": "HDFC Bank is one of India's premier banking institutions. It offers a wide range of financial products and services. The bank is known for its robust digital banking platform."},
-            {"symbol": "SBIN", "company": "State Bank of India", "description": "SBI is India's largest public sector bank providing comprehensive banking services. It has a vast network across the country. The bank serves millions of customers daily."},
-            {"symbol": "IDFCFIRSTB", "company": "IDFC First Bank Ltd.", "description": "IDFC First Bank offers banking and financial services with a focus on retail and business banking. It aims for customer-centric growth. The bank emphasizes sustainable banking practices."},
-            {"symbol": "DCBBANK", "company": "DCB Bank Ltd.", "description": "DCB Bank provides banking services to individuals and businesses in India. It focuses on personalized financial solutions. The bank operates a growing network of branches."}
+            {"symbol": "HDFCBANK", "company": "HDFC Bank Ltd.", "description": "HDFC Bank is one of India's premier banking institutions."},
+            {"symbol": "SBIN", "company": "State Bank of India", "description": "SBI is India's largest public sector bank providing comprehensive banking services."},
+            {"symbol": "IDFCFIRSTB", "company": "IDFC First Bank Ltd.", "description": "IDFC First Bank offers banking and financial services with a focus on retail and business banking."},
+            {"symbol": "DCBBANK", "company": "DCB Bank Ltd.", "description": "DCB Bank provides banking services to individuals and businesses in India."}
         ],
         "Energy": [
-            {"symbol": "TATAPOWER", "company": "Tata Power Company Ltd.", "description": "Tata Power is one of India's largest integrated power companies. It operates in generation, transmission, and distribution. The company is part of the Tata Group."},
-            {"symbol": "ADANIGREEN", "company": "Adani Green Energy Ltd.", "description": "Adani Green is a leading renewable energy company in India. It focuses on sustainable solar and wind power projects. The company aims to expand green energy capacity."},
-            {"symbol": "NHPC", "company": "NHPC Ltd.", "description": "NHPC is a major hydropower generation company in India. It develops and operates hydroelectric projects nationwide. The company contributes significantly to India's power sector."},
-            {"symbol": "RELINFRA", "company": "Reliance Infrastructure Ltd.", "description": "Reliance Infra is involved in power generation, transmission, and distribution. It also undertakes infrastructure projects. The company is part of the Reliance Group."}
+            {"symbol": "TATAPOWER", "company": "Tata Power Company Ltd.", "description": "Tata Power is one of India's largest integrated power companies."},
+            {"symbol": "ADANIGREEN", "company": "Adani Green Energy Ltd.", "description": "Adani Green is a leading renewable energy company in India."},
+            {"symbol": "NHPC", "company": "NHPC Ltd.", "description": "NHPC is a major hydropower generation company in India."},
+            {"symbol": "RELINFRA", "company": "Reliance Infrastructure Ltd.", "description": "Reliance Infra is involved in power generation, transmission, and distribution."}
         ],
         "Consumer": [
-            {"symbol": "HINDUNILVR", "company": "Hindustan Unilever Ltd.", "description": "Hindustan Unilever is a leading consumer goods company in India. It offers a wide range of FMCG products. The company is known for its strong brand portfolio."},
-            {"symbol": "ITC", "company": "ITC Ltd.", "description": "ITC is a diversified conglomerate with a strong presence in FMCG. It also operates in hotels and agribusiness. The company is a major player in India's consumer market."},
-            {"symbol": "BAJAJELEC", "company": "Bajaj Electricals Ltd.", "description": "Bajaj Electricals is a consumer electrical equipment manufacturing company. It specializes in appliances and lighting. The company has a strong presence in India."},
-            {"symbol": "VOLTAS", "company": "Voltas Ltd.", "description": "Voltas is a leading air conditioning and engineering services company. It is part of the Tata Group. The company excels in cooling solutions and projects."}
+            {"symbol": "HINDUNILVR", "company": "Hindustan Unilever Ltd.", "description": "Hindustan Unilever is a leading consumer goods company in India."},
+            {"symbol": "ITC", "company": "ITC Ltd.", "description": "ITC is a diversified conglomerate with a strong presence in FMCG."},
+            {"symbol": "BAJAJELEC", "company": "Bajaj Electricals Ltd.", "description": "Bajaj Electricals is a consumer electrical equipment manufacturing company."},
+            {"symbol": "VOLTAS", "company": "Voltas Ltd.", "description": "Voltas is a leading air conditioning and engineering services company."}
         ]
     }
 }
@@ -355,7 +355,7 @@ def get_stock_data(symbol):
         st.error(f"Error processing stock data: {str(e)}")
         return None
 
-# Function to display stock card with divs instead of spans
+# Function to display stock card
 def display_stock_card(symbol, stock_info, stock_data):
     try:
         ltp = stock_data.get('ltp', 'N/A')
@@ -368,7 +368,7 @@ def display_stock_card(symbol, stock_info, stock_data):
             change_icon = '▲' if percent_change >= 0 else '▼'
         else:
             percent_display = str(percent_change)
-            change_class = 'negative'  # Default for non-numeric
+            change_class = 'negative'
             change_icon = '—'
         
         company_name = stock_info.get('company', 'Unknown Company')
@@ -398,16 +398,14 @@ def display_stock_card(symbol, stock_info, stock_data):
         st.error(f"Error rendering stock card: {e}")
 
 def main():
-    # Get the symbol from session state
     symbol = st.session_state.get('selected_symbol', None)
     
     if not symbol:
         st.error("No stock symbol provided. Please return to the dashboard and select a stock.")
         if st.button("Back to Dashboard", key="back_error"):
-            st.switch_page("Home.py")
+            st.switch_page("home.py")
         return
     
-    # Find stock info
     stock_info = None
     for sector in stocks["Sector"].values():
         for stock in sector:
@@ -420,21 +418,18 @@ def main():
     if not stock_info:
         st.error(f"Stock {symbol} not found in the database.")
         if st.button("Back to Dashboard", key="back_not_found"):
-            st.switch_page("Home.py")
+            st.switch_page("home.py")
         return
     
-    # Get stock data
     stock_data = get_stock_data(symbol)
     if stock_data is None:
         st.error("Error loading stock data. Please try again.")
         if st.button("Back to Dashboard", key="back_error_data"):
-            st.switch_page("Home.py")
+            st.switch_page("home.py")
         return
 
-    # Stock Header using the new function
     display_stock_card(symbol, stock_info, stock_data)
     
-    # Description Card
     st.markdown(f"""
     <div class="description-card">
         <div class="description-title">Company Overview</div>
@@ -442,7 +437,6 @@ def main():
     </div>
     """, unsafe_allow_html=True)
     
-    # Key Metrics Grid
     st.markdown(f"""
     <div class="metrics-grid">
         <div class="metric-card">
@@ -472,13 +466,11 @@ def main():
     </div>
     """, unsafe_allow_html=True)
     
-    # Chart Section
     st.markdown("""
     <div class="chart-container">
         <h2 style="margin-bottom: 1rem;">Price History</h2>
     """, unsafe_allow_html=True)
     
-    # Chart Toggle
     col1, col2 = st.columns([5, 1])
     with col2:
         st.markdown('<div class="toggle-container">', unsafe_allow_html=True)
@@ -494,7 +486,6 @@ def main():
     if monthly:
         st.session_state['chart_view'] = 'monthly'
     
-    # Display Chart
     if st.session_state['chart_view'] == 'weekly':
         data = stock_data['weekly_performance']
         title = "Weekly Performance"
@@ -529,9 +520,8 @@ def main():
     
     st.markdown("</div>", unsafe_allow_html=True)
     
-    # Back Button
     if st.button("← Back to Dashboard", key="back_main"):
-        st.switch_page("Home.py")
+        st.switch_page("home.py")
 
 if __name__ == "__main__":
     main()
